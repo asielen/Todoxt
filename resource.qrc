@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix=":/icons">
+    <file>view-refresh.png</file>
+    <file>preferences-system.png</file>
+  </qresource>
+</RCC>
