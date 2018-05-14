@@ -27,7 +27,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="findEdit"/>
+         <widget class="QLineEdit" name="findEdit">
+          <property name="acceptDrops">
+           <bool>true</bool>
+          </property>
+          <property name="clearButtonEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QToolButton" name="btnRefresh">
@@ -36,7 +43,7 @@
           </property>
           <property name="icon">
            <iconset theme="view-refresh">
-            <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
+            <normaloff>../../../.designer/backup</normaloff>../../../.designer/backup</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+R</string>
@@ -50,7 +57,7 @@
           </property>
           <property name="icon">
            <iconset theme="preferences-system">
-            <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
+            <normaloff>../../../.designer/backup</normaloff>../../../.designer/backup</iconset>
           </property>
           <property name="shortcut">
            <string>Ctrl+N</string>
@@ -61,6 +68,21 @@
       </item>
       <item>
        <widget class="QTreeWidget" name="treeWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+        </property>
         <property name="showDropIndicator" stdset="0">
          <bool>false</bool>
         </property>
@@ -71,6 +93,9 @@
          <enum>QAbstractItemView::SingleSelection</enum>
         </property>
         <property name="rootIsDecorated">
+         <bool>false</bool>
+        </property>
+        <property name="uniformRowHeights">
          <bool>false</bool>
         </property>
         <property name="itemsExpandable">
@@ -149,7 +174,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../prueba todo/resource.qrc"/>
+  <include location="../../prueba todo/resource.qrc"/>
  </resources>
  <connections/>
 </ui>

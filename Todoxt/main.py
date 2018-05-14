@@ -79,7 +79,8 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
         self.readTodoFile()
 
     def addItems(self, todo):
-        item = todoxt_window.customQtTreeWidgetItem(todo) #QtWidgets.QTreeWidgetItem()
+        item = todoxt_window.customQtTreeWidgetItem(todo)
+        item.isExpanded = False
         item.setText(1,todo.getTask())
         if todo.creation_date:
             item.setText(2, str(todo.creation_date))
@@ -91,6 +92,7 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
             QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
         item.setCheckState(0,QtCore.Qt.Unchecked)
         self.treeWidget.addTopLevelItem(item)
+
 
     def findInList(self):
         if self.findEdit.text():
@@ -121,18 +123,16 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
 
     def taskCompleted(self,item):
         setattr(todoParser.Todo(item._todo),'completed',True)
-        donefile = open(os.getcwd() + '/done.txt', 'a')
+        donefile = open(os.path.dirname(self._path)+ '/done.txt', 'a')
         donefile.write(str(item._todo)+'\n')
         donefile.close()
         self._tasks.remove(item._todo)
-        self.treeWidget.removeItemWidget(item,0)
+        self.treeWidget.takeTopLevelItem(self.treeWidget.indexOfTopLevelItem(item))
         todoParser.to_file(self._path, self._tasks)
-        self.refreshTaskList(self._tasks)
-        if self.findEdit.text():
-            self.findInList()
 
     def refreshTaskList(self,taskList):
-        self.treeWidget.clear()
+        for index in self.treeWidget.topLevelItemCount():
+            self.treeWidget.takeTopLevelItem(index)
         for todo in taskList:
             self.addItems(todo)
 
@@ -141,10 +141,7 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
         todo = todoParser.new_todo(text)
         self._tasks.append(todo)
         todoParser.to_file(self._path, self._tasks)
-        self._opened=False
-        self.readTodoFile()
-        if self.findEdit.text():
-            self.findInList()
+        self.addItems(todo)
 
     def onNewTask(self):
         if self.EditNew.text():
