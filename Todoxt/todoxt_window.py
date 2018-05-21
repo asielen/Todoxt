@@ -38,9 +38,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.btnSettings)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.treeWidget = QtWidgets.QTreeWidget(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
+        self.treeWidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         sizePolicy.setHeightForWidth(self.treeWidget.sizePolicy().hasHeightForWidth())
         self.treeWidget.setSizePolicy(sizePolicy)
         self.treeWidget.setMouseTracking(True)
@@ -58,6 +59,8 @@ class Ui_MainWindow(object):
         item_0 = QtWidgets.QTreeWidgetItem(self.treeWidget)
         item_0.setCheckState(0, QtCore.Qt.Checked)
         self.treeWidget.header().setVisible(True)
+        self.treeWidget.header().setStretchLastSection(False)
+        self.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
         self.verticalLayout.addWidget(self.treeWidget)
         self.EditNew = QtWidgets.QLineEdit(self.centralwidget)
         self.EditNew.setObjectName("EditNew")
@@ -91,6 +94,7 @@ class Ui_MainWindow(object):
         self.treeWidget.headerItem().setText(3, _translate("MainWindow", "Context"))
         self.treeWidget.headerItem().setText(4, _translate("MainWindow", "Project"))
         self.actionConfiguracion.setText(_translate("MainWindow", "Configuracion"))
+
 
 
 class customQtTreeWidgetItem(QtWidgets.QTreeWidgetItem):

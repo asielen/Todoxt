@@ -70,6 +70,10 @@ def from_string(string):
     """
     todos = []
 
+    projects = []
+
+    contexts = []
+
     for line in string.strip().splitlines():
         line = line.strip()
 
@@ -98,12 +102,14 @@ def from_string(string):
 
         if len(todo_projects) > 0:
             todo.projects = todo_projects
+            projects.append(todo_projects[0])
             text = todo_project_regex.sub('', text).strip()
 
         todo_contexts = todo_context_regex.findall(text)
 
         if len(todo_contexts) > 0:
             todo.contexts = todo_contexts
+            contexts.append(todo_contexts[0])
             text = todo_context_regex.sub('', text).strip()
 
         todo_tags = todo_tag_regex.findall(text)
@@ -118,7 +124,7 @@ def from_string(string):
 
         todos.append(todo)
 
-    return todos
+    return todos, contexts, projects
 
 def new_todo(string):
     """Creates a new Todo from a string.

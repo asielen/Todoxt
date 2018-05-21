@@ -6,9 +6,9 @@ import configparser
 import logging
 import qdarkstyle
 
-import todoParser
-import todoxt_window
-import settings_dialog
+from Todoxt import todoParser
+from Todoxt import todoxt_window
+from Todoxt import settings_dialog
 
 
 class todoTxtApp(todoxt_window.Ui_MainWindow):
@@ -24,7 +24,7 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
         # self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
         self.readTodoFile()
 
-        self.shortcutNewTask = QtWidgets.QShortcut(QtGui.QKeySequence('Ctrl+N'), self.EditNew, self.setFocusNewTask)
+        self.shortcutNewTask = QtWidgets.QShortcut(QtGui.QKeySequence('Ctrl+T'), self.EditNew, self.setFocusNewTask)
         self.shortcutFind = QtWidgets.QShortcut(QtGui.QKeySequence('Ctrl+F'), self.findEdit, self.setFocusFindEdit)
 
         self.treeWidget.itemChanged.connect(self.onChanged)
@@ -35,10 +35,11 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
         self.EditNew.returnPressed.connect(self.onNewTask)
         self.findEdit.textChanged.connect(self.findInList)
 
+
     def readTodoFile(self):
         if self._opened == False and str(self._path):
             try:
-                self._tasks = todoParser.from_file(self._path)
+                self._tasks, self._contexts, self._projects = todoParser.from_file(self._path)
                 self.treeWidget.clear()
                 for todo in self._tasks:
                     self.addItems(todo)
@@ -101,9 +102,9 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
             for todo in self._tasks:
                 if self.findEdit.text().upper() in str(todo).upper():
                     _searchList.append(todo)
-            self.refreshTaskList(_searchList)
+            self.onRefresh
         else:
-            self.refreshTaskList(self._tasks)
+            self.onRefresh
 
     def onChanged(self,item,column):
         if column == 1:
@@ -112,7 +113,7 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
             setattr(item._todo,'completion_date',item.text(2))
         elif column == 3:
             setattr(item._todo,'contexts',item.text(3))
-        todoParser.to_file(self._path,self._tasks)
+        Todoxt.todoParser.to_file(self._path,self._tasks)
 
     def onClicked(self,item,column):
         if column == 0:
@@ -122,13 +123,13 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
             self.treeWidget.blockSignals(False)
 
     def taskCompleted(self,item):
-        setattr(todoParser.Todo(item._todo),'completed',True)
+        setattr(Todoxt.todoParser.Todo(item._todo),'completed',True)
         donefile = open(os.path.dirname(self._path)+ '/done.txt', 'a')
         donefile.write(str(item._todo)+'\n')
         donefile.close()
         self._tasks.remove(item._todo)
         self.treeWidget.takeTopLevelItem(self.treeWidget.indexOfTopLevelItem(item))
-        todoParser.to_file(self._path, self._tasks)
+        Todoxt.todoParser.to_file(self._path, self._tasks)
 
     def refreshTaskList(self,taskList):
         for index in self.treeWidget.topLevelItemCount():
@@ -138,9 +139,9 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
 
 
     def newTask(self,text):
-        todo = todoParser.new_todo(text)
+        todo = Todoxt.todoParser.new_todo(text)
         self._tasks.append(todo)
-        todoParser.to_file(self._path, self._tasks)
+        Todoxt.todoParser.to_file(self._path, self._tasks)
         self.addItems(todo)
 
     def onNewTask(self):
