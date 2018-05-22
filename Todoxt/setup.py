@@ -1,35 +1,61 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/python3
 
 import sys
-import cx_Freeze
+from cx_Freeze import setup, Executable
 
 base = None
 if sys.platform == 'win32':
     base = 'Win32GUI'
 
-options = {
-    'build_exe': {
-        'includes': 'atexit'
-    }
-}
 
-data_files = [('',['config.ini'])]
+
+data_files = [('',['config.ini','view-refresh.png','preferences-system.png','icon.png'])]
+
+shortcut_table = [
+    ("DesktopShortcut",        # Shortcut
+     "DesktopFolder",          # Directory_
+     "Todoxt",           # Name
+     "TARGETDIR",              # Component_
+     "[TARGETDIR]\Todoxt.exe",# Target
+     None,                     # Arguments
+     None,                     # Description
+     None,                     # Hotkey
+     None,                     # Icon
+     None,                     # IconIndex
+     None,                     # ShowCmd
+     "TARGETDIR",               # WkDir
+     )
+    ]
+
+# Now create the table dictionary
+msi_data = {"Shortcut": shortcut_table}
+
+# Change some default MSI options and specify the use of the above defined tables
+bdist_msi_options = {'data': msi_data}
+
 
 ##executables = [
 ##    Executable('Todoxt.py', base=base)
 ##]
 
-executables = [cx_Freeze.Executable(
+executables = [Executable(
     "Todoxt.py",
     base="Win32GUI",
     icon="icon.ico"
     )]
 
-cx_Freeze.setup(name='Todoxt',
-                version='0.1',
-                description='Todo.xtx GUI application',
-                options=options,
-                executables=executables,
-                data_files = data_files
-                )
+options = {
+    'build_exe': {
+        'includes': 'atexit'
+    },"bdist_msi": bdist_msi_options
+}
+
+setup(name='Todoxt',
+      shortcutName="Todoxt",
+      shortcutDir="DesktopFolder",
+      version='0.1',
+      description='Todo.xtx GUI application',
+      options=options,
+      executables=executables,
+      data_files = data_files
+)
