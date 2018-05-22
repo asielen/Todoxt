@@ -6,9 +6,9 @@ import configparser
 import logging
 import qdarkstyle
 
-from Todoxt import todoParser
-from Todoxt import todoxt_window
-from Todoxt import settings_dialog
+import todoParser
+import todoxt_window
+import settings_dialog
 
 
 class todoTxtApp(todoxt_window.Ui_MainWindow):
@@ -102,9 +102,9 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
             for todo in self._tasks:
                 if self.findEdit.text().upper() in str(todo).upper():
                     _searchList.append(todo)
-            self.onRefresh
+            self.refreshTaskList(_searchList)
         else:
-            self.onRefresh
+            self.refreshTaskList(self._tasks)
 
     def onChanged(self,item,column):
         if column == 1:
@@ -132,8 +132,10 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
         Todoxt.todoParser.to_file(self._path, self._tasks)
 
     def refreshTaskList(self,taskList):
-        for index in self.treeWidget.topLevelItemCount():
+        index = 0
+        while index < self.treeWidget.topLevelItemCount():
             self.treeWidget.takeTopLevelItem(index)
+            index+=index
         for todo in taskList:
             self.addItems(todo)
 

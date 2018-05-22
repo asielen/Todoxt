@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+#!/usr/bin/python3
 
 import sys
-from cx_Freeze import setup, Executable
+import cx_Freeze
 
 base = None
 if sys.platform == 'win32':
@@ -19,16 +20,16 @@ data_files = [('',['config.ini'])]
 ##    Executable('Todoxt.py', base=base)
 ##]
 
-executables = [Executable(
+executables = [cx_Freeze.Executable(
     "Todoxt.py",
     base="Win32GUI",
     icon="icon.ico"
     )]
 
-setup(name='Todoxt',
-      version='0.1',
-      description='Todo.xtx GUI application',
-      options=options,
-      executables=executables,
-      data_files = data_files
-)
+cx_Freeze.setup(name='Todoxt',
+                version='0.1',
+                description='Todo.xtx GUI application',
+                options=options,
+                executables=executables,
+                data_files = data_files
+                )

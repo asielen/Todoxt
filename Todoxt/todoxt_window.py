@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -62,6 +63,7 @@ class Ui_MainWindow(object):
         self.treeWidget.header().setStretchLastSection(False)
         self.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
         self.verticalLayout.addWidget(self.treeWidget)
+        # self.EditNew = QtWidgets.QLineEdit(self.centralwidget)
         self.EditNew = QtWidgets.QLineEdit(self.centralwidget)
         self.EditNew.setObjectName("EditNew")
         self.verticalLayout.addWidget(self.EditNew)
