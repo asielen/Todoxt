@@ -5,11 +5,16 @@ import os
 import configparser
 import logging
 import qdarkstyle
+from pathlib import Path
+if os.name == 'nt':
+    import winreg
 
 import todoParser
 import todoxt_window
 import settings_dialog
 
+REGISTRY_KEY = 'Software\Todoxt'
+LINUX_CONFIG_PATH = '/.Todoxt'
 
 class todoTxtApp(todoxt_window.Ui_MainWindow):
     def __init__(self,dialog):
@@ -17,10 +22,23 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         todoxt_window.Ui_MainWindow.__init__(self)
+        self._os = os.name
+        if self._os == 'posix':
+            self.configPath = str(Path.home()) + LINUX_CONFIG_PATH
+            self._path, self._qtstyle = self.loadConfig()
+        elif self._os == 'nt':
+            hKey = winreg.OpenKey(winreg.HKEY_CURRENT_USER, REGISTRY_KEY)
+            try:
+                self._path = winreg.QueryValue(hKey, "Path")
+                self._qtstyle = winreg.QueryValue(hKey, "QtStyle")
+            except OSError:
+                self._path = ''
+                winreg.SetValue(hKey, "Path", winreg.REG_SZ, self._path)
+
+            winreg.CloseKey(hKey)
         self._opened =False
         self.setupUi(dialog)
-        # load path to todotxt file
-        self._path ,self._qtstyle = self.loadConfig()
+
         # self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
         self.readTodoFile()
 
@@ -34,6 +52,10 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
         self.btnRefresh.clicked.connect(self.onRefresh)
         self.EditNew.returnPressed.connect(self.onNewTask)
         self.findEdit.textChanged.connect(self.findInList)
+
+    def checkDir(self, file_path):
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
 
 
     def readTodoFile(self):
@@ -55,10 +77,10 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
 
     def loadConfig(self):
         self.config = configparser.ConfigParser()
-        if os.path.isfile(os.getcwd() + '/config.ini'):
-            self.config.read(os.getcwd() + '/config.ini')
-            if self.config.has_option('TodoTxtApp', 'Path') and self.config.has_option('TodoTxtApp', 'QT_Style'):
-                return self.config.get('TodoTxtApp', 'Path') , self.config.get('TodoTxtApp', 'QT_Style')
+        if os.path.isfile(self.configPath + '/config.ini'):
+            self.config.read(self.configPath + '/config.ini')
+            if self.config.has_option('TodoTxtApp', 'Path') and self.config.has_option('TodoTxtApp', 'QTStyle'):
+                return self.config.get('TodoTxtApp', 'Path') , self.config.get('TodoTxtApp', 'QTStyle')
             else:
                 self.createConfigFile()
                 return None,None
@@ -66,10 +88,10 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
             self.createConfigFile()
 
     def createConfigFile(self):
-        cfgfile = open(os.getcwd() + '/config.ini', 'w')
+        cfgfile = open(self.configPath + '/config.ini', 'w')
         self.config.add_section('TodoTxtApp')
         self.config.set('TodoTxtApp', 'Path', '')
-        self.config.set('TodoTxtApp', 'QT_Style', 'White')
+        self.config.set('TodoTxtApp', 'QTStyle', 'White')
         self.config.write(cfgfile)
         cfgfile.close()
         self.config.get('TodoTxtApp', 'Path')
@@ -159,20 +181,30 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
         self._path= dialog.lineEdit.text()
         if str(self._path)!='':
             try:
-                cfgfile = open(os.getcwd() + '/config.ini', 'w')
-                self.config.set('TodoTxtApp', 'Path', self._path)
-                self.config.write(cfgfile)
-                cfgfile.close()
+                if self._os == 'posix':
+                    cfgfile = open(self.configPath + '/config.ini', 'w')
+                    self.config.set('TodoTxtApp', 'Path', self._path)
+                    self.config.write(cfgfile)
+                    cfgfile.close()
+                elif self._os == 'nt':
+                    hKey = winreg.OpenKey(winreg.HKEY_CURRENT_USER, REGISTRY_KEY, access=winreg.KEY_READ)
+                    winreg.SetValue(hKey, "Path", winreg.REG_SZ, self._path)
+                    winreg.CloseKey(hKey)
                 self._opened = False
                 self.readTodoFile()
             except:
                 self.logger.error('Error')
         if self._qtstyle!=dialog.comboBox.currentText():
-            cfgfile = open(os.getcwd() + '/config.ini', 'w')
             self._qtstyle = dialog.comboBox.currentText()
-            self.config.set('TodoTxtApp', 'QT_Style', self._qtstyle)
-            self.config.write(cfgfile)
-            cfgfile.close()
+            if self._os == 'posix':
+                cfgfile = open(self.configPath + '/config.ini', 'w')
+                self.config.set('TodoTxtApp', 'QTStyle', self._qtstyle)
+                self.config.write(cfgfile)
+                cfgfile.close()
+            elif self._os == 'nt':
+                hKey = winreg.OpenKey(winreg.HKEY_CURRENT_USER, REGISTRY_KEY, access=winreg.KEY_READ)
+                winreg.SetValue(hKey, "QTStyle", winreg.REG_SZ, self._qtstyle)
+                winreg.CloseKey(hKey)
 
 
 
@@ -200,16 +232,33 @@ class MessageBox(QtWidgets.QMessageBox):
         error_dialog.setInformativeText(msg2)
         error_dialog.show()
 
+def loadQtStyle():
+    Qtstyle = 'White'
+    if os.name == 'nt':
+        try:
+            hKey = winreg.OpenKey(winreg.HKEY_CURRENT_USER, REGISTRY_KEY)
+            winreg.QueryValue(hKey, "QTStyle")
+        except OSError:
+            hKey = winreg.CreateKey(winreg.HKEY_CURRENT_USER, REGISTRY_KEY)
+            winreg.SetValue(hKey, "QTStyle", winreg.REG_SZ, Qtstyle)
+
+        return  winreg.QueryValue(hKey, "QTStyle")
+        winreg.CloseKey(hKey)
+    else:
+        config = configparser.ConfigParser()
+        linuxPath = str(Path.home())+LINUX_CONFIG_PATH
+        if os.path.isfile( linuxPath+ '/config.ini'):
+            config.read(linuxPath+ '/config.ini')
+            if config.has_option('TodoTxtApp', 'QTStyle'):
+                Qtstyle = config.get('TodoTxtApp', 'QTStyle')
+        return Qtstyle
+
+
 if __name__=='__main__':
     app=QtWidgets.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon('icon.png'))
-    config = configparser.ConfigParser()
-    Qtstyle = 'White'
-    if os.path.isfile(os.getcwd() + '/config.ini'):
-        config.read(os.getcwd() + '/config.ini')
-        if config.has_option('TodoTxtApp', 'QT_Style') :
-            Qtstyle = config.get('TodoTxtApp', 'QT_Style')
-    if Qtstyle =='Black':
+    Qtstyle = loadQtStyle()
+    if Qtstyle == 'Black':
         app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     dialog=QtWidgets.QMainWindow()
     form = todoTxtApp(dialog)
