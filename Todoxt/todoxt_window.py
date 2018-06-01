@@ -84,7 +84,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Todoxt"))
-        self.label.setText(_translate("MainWindow", "Buscar"))
+        self.label.setText(_translate("MainWindow", "Find"))
         self.btnRefresh.setText(_translate("MainWindow", "..."))
         self.btnRefresh.setShortcut(_translate("MainWindow", "Ctrl+R"))
         self.btnSettings.setText(_translate("MainWindow", "..."))
@@ -95,7 +95,7 @@ class Ui_MainWindow(object):
         self.treeWidget.headerItem().setText(2, _translate("MainWindow", "Creation date"))
         self.treeWidget.headerItem().setText(3, _translate("MainWindow", "Context"))
         self.treeWidget.headerItem().setText(4, _translate("MainWindow", "Project"))
-        self.actionConfiguracion.setText(_translate("MainWindow", "Configuracion"))
+        self.actionConfiguracion.setText(_translate("MainWindow", "Configuration"))
 
 
 
