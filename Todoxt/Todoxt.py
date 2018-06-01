@@ -135,6 +135,8 @@ class todoTxtApp(todoxt_window.Ui_MainWindow):
             setattr(item._todo,'completion_date',item.text(2))
         elif column == 3:
             setattr(item._todo,'contexts',item.text(3))
+        elif column == 4:
+            setattr(item._todo, 'projects', [item.text(4)])
         todoParser.to_file(self._path,self._tasks)
 
     def onClicked(self,item,column):
